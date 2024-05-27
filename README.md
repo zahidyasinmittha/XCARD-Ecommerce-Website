@@ -1,7 +1,5 @@
 # XCARD-Ecommerce-Website
 
-Here's the description in Markdown format with code snippets included:
-
 ---
 
 # E-commerce Website
