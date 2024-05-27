@@ -47,8 +47,11 @@ This is a full-stack e-commerce web application built using the MERN stack (Mong
 
 4. Set up environment variables in a `.env` file in the server directory:
    ```env
-   MONGO_URI=your-mongodb-uri
-   JWT_SECRET=your-jwt-secret
+   MONGODB_URI = mongo db url
+   JWT_SECRET_KEY = "you jwt key"
+   FRONTEND_URL = "http://localhost:5173"
+   VERIFICATION_CODE_SENDING_EMAIL = "your email for email sending"
+   VERIFICATION_CODE_SENDING_PASSWORD = "app password"
    ```
 
 5. Run the application:
