@@ -30,6 +30,10 @@ const signUpSchema = new mongoose.Schema({
         type: String,
         default: ''  // Default can be an empty string or provide a more specific default value
     },
+    isLogedIn: {
+        type: Boolean,
+        default: false  // Default can be true or false based on your requirement
+    },
     gender: {
         type: String,
         enum: ['Male', 'Female', 'Other'],  // Define possible values for gender

@@ -107,7 +107,7 @@ function Header() {
                           My Profile
                         </Link>
                       </button>
-                     {userDetail?.data?.role ==="SELLER" ?<button
+                     {userDetail?.data?.role ==="seller" ?<button
                         tabIndex="-1"
                         role="menuitem"
                         className="hover:text-[#f29221] active:text-red-600 flex w-full cursor-pointer select-none items-center gap-2 rounded-md px-3 pt-[9px] pb-2 text-start leading-tight outline-none transition-all hover:bg-blue-gray-50 hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900"

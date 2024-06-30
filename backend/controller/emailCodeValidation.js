@@ -2,25 +2,8 @@ const nodemailer = require("nodemailer");
 const User = require("../models/userSignUpModel");
 const verificationCodeModel = require("../models/verificationCodeModel");
 
-async function emailCodeSendingController(req, res) {
+async function emailSending(email, massage) {
   try {
-    if (!process.env.VERIFICATION_CODE_SENDING_EMAIL || !process.env.VERIFICATION_CODE_SENDING_PASSWORD) {
-      console.error("Email sending credentials are not set");
-      throw new Error("Something went wrong");
-    }
-
-    const { email, check } = req.body;
-    console.log(email, check);
-    if (!email) throw new Error("Email is required");
-
-    if (check === undefined) {
-      const user = await User.findOne({ email });
-      if (!user) throw new Error("User does not exist");
-    }
-
-    const codesend = await verificationCodeModel.findOne({ email });
-    if (codesend) throw new Error("Verification code is already sent to your email. Try again after 5 minutes.");
-
     const getEmailService = (email) => {
       let domain = email.split("@")[1];
       domain = domain.split(".")[0].toLowerCase();
@@ -38,53 +21,82 @@ async function emailCodeSendingController(req, res) {
       },
     });
 
-    const verificationCode = Math.floor(100000 + Math.random() * 900000);
-
     const mailOptions = {
       from: process.env.VERIFICATION_CODE_SENDING_EMAIL,
       to: email,
       subject: "Verification Code",
-      text: `Your verification code is: ${verificationCode} \nNote: This code will expire after 5 minutes.`,
+      text: massage,
     };
 
-    transporter.sendMail(mailOptions, async (error, info) => {
-      if (error) {
-        return res.json({
-          message: "An error occurred while sending the verification code",
-          codeSend: false,
-          error: true,
-          success: false,
-        });
-      }
-
-      try {
-        const verificationCodeData = new verificationCodeModel({
-          email: email,
-          verificationCode: verificationCode,
-        });
-
-        await verificationCodeData.save();
-
-        res.json({
-          message: "Verification code sent successfully",
-          codeSend: true,
-          error: false,
-          success: true,
-        });
-      } catch (saveError) {
-        console.error("Error saving verification code:", saveError);
-        res.json({
-          message: "Something went wrong while saving the verification code",
-          codeSend: false,
-          error: true,
-          success: false,
-        });
-      }
+    await transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) return false;
     });
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function emailCodeSendingController(req, res) {
+  try {
+    if (
+      !process.env.VERIFICATION_CODE_SENDING_EMAIL ||
+      !process.env.VERIFICATION_CODE_SENDING_PASSWORD
+    ) {
+      console.error("Email sending credentials are not set");
+      throw new Error("Something went wrong");
+    }
+
+    const { email, check } = req.body;
+    if (!email) throw new Error("Email is required");
+
+    if (check === undefined) {
+      const user = await User.findOne({ email });
+      if (!user) throw new Error("User does not exist");
+    }
+
+    const codesend = await verificationCodeModel.findOne({ email });
+    if (codesend)
+      throw new Error(
+        "Verification code is already sent to your email. Try again after 5 minutes."
+      );
+
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+    const massage = `Your varification code is ${verificationCode}. This code will be expired after 5 minutes `
+
+    const emailSent = await emailSending(email,massage);
+    if (!emailSent) {
+      throw new Error("Something went wrong while sending the email");
+    }
+    try {
+      const verificationCodeData = new verificationCodeModel({
+        email: email,
+        verificationCode: verificationCode,
+      });
+
+      await verificationCodeData.save();
+
+      res.json({
+        message: "Verification code sent successfully",
+        codeSend: true,
+        error: false,
+        success: true,
+      });
+    } catch (saveError) {
+      console.error("Error saving verification code:", saveError);
+      res.json({
+        message: "Something went wrong while saving the verification code",
+        codeSend: false,
+        error: true,
+        success: false,
+      });
+    }
   } catch (error) {
     console.error("Error in emailCodeSendingController:", error);
     res.json({
-      message: error.message || "An error occurred while sending the verification code",
+      message:
+        error.message ||
+        "An error occurred while sending the verification code",
       codeSend: false,
       error: true,
       success: false,
@@ -100,7 +112,7 @@ async function emailCodeValidationController(req, res) {
     const user = await verificationCodeModel.findOne({ email });
     if (!user)
       throw new Error("User does not exist or first send the code on email");
-    console.log(user.verificationCode)
+    console.log(user.verificationCode);
     if (user.verificationCode !== verificationCode)
       throw new Error("Invalid verification code");
     else {

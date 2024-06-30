@@ -1,8 +1,8 @@
 const domain = "http://localhost:8080"
 const apiUrls = {
     signUp : {
-       url: `${domain}/api/signup`,
-         method: 'POST'
+        url: `${domain}/api/signup`,
+        method: 'POST'
     } ,
     login : {
         url: `${domain}/api/login`,
@@ -31,6 +31,26 @@ const apiUrls = {
     updateUserBasicDetails: {
         url: `${domain}/api/updateUserDetails`,
         method: 'PUT'
+    },
+    paymentOptionUpdate: {
+        url: `${domain}/api/paymentOptionUpdate`,
+        method: 'PUT'
+    },
+    shippingAddressUpdate: {
+        url: `${domain}/api/shippingAddressUpdate`,
+        method: 'PUT'
+    },
+    updatePassword:{
+        url: `${domain}/api/updatePassword`,
+        method: 'PUT'
+    },
+    becomeSeller: {
+        url: `${domain}/api/becomeSeller`,
+        method: 'PUT'
+    },
+    deleteUser: {
+        url: `${domain}/api/deleteUser`,
+        method: 'DELETE'
     }
 }
 export default apiUrls;

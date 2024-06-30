@@ -23,6 +23,12 @@ async function userSignInController(req,res){
             secure: true
         }
 
+        const updateResult = await User.updateOne({ email: email },
+            { $set: { isLogedIn: true } })
+        if (!updateResult.acknowledged) throw new Error("something went wrong");
+        
+        res.cookie('isLogedIn', true)
+        
         res.cookie("token", token, tokenOptions).status(200).json({
             message: `${existingUser.name} has Loged in successfully`,
             data : token,

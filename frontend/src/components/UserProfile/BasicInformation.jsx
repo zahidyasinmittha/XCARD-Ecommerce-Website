@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import apiUrls from "../../common/apiUrls";
 import {useNavigate} from 'react-router-dom'
+import Cookies from 'js-cookie';
 
 function BasicInformation() {
   const navigator = useNavigate()
@@ -21,19 +22,23 @@ function BasicInformation() {
   });
 
   useEffect(() => {
-    if (userDetail?.data) {
+    const isLogedIn = Cookies.get('isLogedIn');
+
+    if (!isLogedIn || isLogedIn === 'false') {
+      navigator('/login');
+      return;
+    }
+
+    if (userDetail) {
       setLocalUserDetail({
-        name: userDetail.data.name || "",
-        location: userDetail.data.location || "",
-        email: userDetail.data.email || "",
-        phone: userDetail.data.phoneNumber || "",
-        gender: userDetail.data.gender || "",
+        name: userDetail.data.name || '',
+        location: userDetail.data.location || '',
+        email: userDetail.data.email || '',
+        phone: userDetail.data.phoneNumber || '',
+        gender: userDetail.data.gender || '',
       });
     }
-    else{
-        navigator('/login')
-    }
-  }, [userDetail]);
+    }, [userDetail]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,6 +101,7 @@ function BasicInformation() {
           onChange={handleChange}
           placeholder="Enter your name"
           className="block w-full mt-1 text-black p-1 border-2 border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
+          required
         />
       </motion.div>
       <motion.div
@@ -113,6 +119,7 @@ function BasicInformation() {
           onChange={handleChange}
           placeholder="Enter your location"
           className="block w-full mt-1 p-1 text-black border-2 border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
+          required
         />
       </motion.div>
       <motion.div
@@ -130,6 +137,7 @@ function BasicInformation() {
           onChange={handleChange}
           placeholder="Enter your email"
           className="block w-full mt-1 p-1 text-black border-2 border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
+          required
         />
       </motion.div>
 
@@ -145,6 +153,7 @@ function BasicInformation() {
         onChange={(e) => setverificationCode(e.target.value)}
         placeholder="Enter your email"
         className="mr-3 mt-1 p-1 text-black border-2 border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
+        required
       />
       <button
         onClick={validateVerificationCode}
@@ -170,6 +179,7 @@ function BasicInformation() {
           onChange={handleChange}
           placeholder="Enter your phone number"
           className="block w-full mt-1 p-1 text-black border-2 border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
+          required
         />
       </motion.div>
       <motion.div
@@ -187,6 +197,7 @@ function BasicInformation() {
             onChange={handleChange}
             placeholder="Select your gender"
             className="block w-full px-3 py-2 text-black border-2 border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
+            required
           >
             <option value="">Select</option>
             <option value="Male">Male</option>

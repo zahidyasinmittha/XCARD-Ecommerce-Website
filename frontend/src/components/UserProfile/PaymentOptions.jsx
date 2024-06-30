@@ -3,11 +3,14 @@ import { motion } from "framer-motion";
 import { FaCcVisa, FaCcMastercard, FaCcDiscover } from "react-icons/fa";
 import { SiAmericanexpress } from "react-icons/si";
 import { useSelector, useDispatch } from "react-redux";
-import { setUserDetail } from "../../redux/slice/userSlice";
-import {useNavigate} from 'react-router-dom'
+import { UpdateInfo } from "../../redux/slice/userSlice";
+import apiUrls from "../../common/apiUrls";
+// import { setUserDetail } from "../../redux/slice/userSlice";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const PaymentOptions = () => {
-  const navigator = useNavigate()
+  const navigate = useNavigate();
   const userDetail = useSelector((state) => state.userDetail.userDetail);
   const dispatch = useDispatch();
   const [localPaymentDetail, setLocalPaymentDetail] = useState({
@@ -19,16 +22,22 @@ const PaymentOptions = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    const isLogedIn = Cookies.get("isLogedIn");
+
+    if (!isLogedIn || isLogedIn === "false") {
+      navigate("/login");
+      return;
+    }
+
     if (userDetail?.data) {
+      console.log(userDetail?.data)
       setLocalPaymentDetail({
-        cardNumber: userDetail.data.cardNumber || "",
-        expiryDate: userDetail.data.expiryDate || "",
-        cvv: userDetail.data.cvv || "",
-        cardType: userDetail.data.cardType || "Visa",
+        cardNumber: userDetail.data.paymentInfo.cardNumber || "",
+        expiryDate: userDetail.data.paymentInfo.expiryDate || "",
+        cvv: userDetail.data.paymentInfo.cvv || "",
+        cardType: userDetail.data.paymentInfo.cardType || "Visa",
       });
     }
-    else
-    navigator('/login')
   }, [userDetail]);
 
   const handleChange = (e) => {
@@ -44,34 +53,26 @@ const PaymentOptions = () => {
   };
 
   const handleReset = () => {
+    
     if (userDetail?.data) {
       setLocalPaymentDetail({
-        cardNumber: userDetail.data.cardNumber || "",
-        expiryDate: userDetail.data.expiryDate || "",
-        cvv: userDetail.data.cvv || "",
-        cardType: userDetail.data.cardType || "Visa",
+        cardNumber: userDetail.data.paymentInfo.cardNumber || "",
+        expiryDate: userDetail.data.paymentInfo.expiryDate || "",
+        cvv: userDetail.data.paymentInfo.cvv || "",
+        cardType: userDetail.data.paymentInfo.cardType || "Visa",
       });
       setErrors({});
     }
   };
 
-  const handleSave = () => {
+  const handleSave = (e) => {
     const validationErrors = validate(localPaymentDetail);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      dispatch(
-        setUserDetail({
-          ...userDetail,
-          data: {
-            ...userDetail.data,
-            cardNumber: localPaymentDetail.cardNumber,
-            expiryDate: localPaymentDetail.expiryDate,
-            cvv: localPaymentDetail.cvv,
-            cardType: localPaymentDetail.cardType,
-          },
-        })
-      );
+      const url = apiUrls.paymentOptionUpdate.url;
+      // console.log({ url: url, userDetail: localPaymentDetail });
+      dispatch(UpdateInfo({ url: url, userDetail: localPaymentDetail }));
     }
   };
 
@@ -118,7 +119,9 @@ const PaymentOptions = () => {
     >
       <h2 className="text-xl font-bold text-[#f29221]">Payment Options</h2>
       <div>
-        <label className="block text-sm font-medium text-[#f29221]">Card Type</label>
+        <label className="block text-sm font-medium text-[#f29221]">
+          Card Type
+        </label>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -131,16 +134,19 @@ const PaymentOptions = () => {
             value={localPaymentDetail.cardType}
             onChange={handleChange}
             className="block w-full mt-1 px-3 py-2 bg-white text-black border border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
+            required
           >
             <option value="Visa">Visa</option>
-            <option value="MasterCard">MasterCard</option>
+            <option value="MasterCard">Mastercard</option>
             <option value="American Express">American Express</option>
             <option value="Discover">Discover</option>
           </select>
         </motion.div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-[#f29221]">Card Number</label>
+        <label className="block text-sm font-medium text-[#f29221]">
+          Card Number
+        </label>
         <motion.input
           type="text"
           name="cardNumber"
@@ -150,11 +156,16 @@ const PaymentOptions = () => {
           className="block w-full mt-1 px-3 py-2 bg-white text-black border border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          required
         />
-        {errors.cardNumber && <p className="text-red-500 text-sm">{errors.cardNumber}</p>}
+        {errors.cardNumber && (
+          <p className="text-red-500 text-sm">{errors.cardNumber}</p>
+        )}
       </div>
       <div>
-        <label className="block text-sm font-medium text-[#f29221]">Expiry Date</label>
+        <label className="block text-sm font-medium text-[#f29221]">
+          Expiry Date
+        </label>
         <motion.input
           type="text"
           name="expiryDate"
@@ -164,8 +175,11 @@ const PaymentOptions = () => {
           className="block w-full mt-1 px-3 py-2 bg-white text-black border border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          required
         />
-        {errors.expiryDate && <p className="text-red-500 text-sm">{errors.expiryDate}</p>}
+        {errors.expiryDate && (
+          <p className="text-red-500 text-sm">{errors.expiryDate}</p>
+        )}
       </div>
       <div>
         <label className="block text-sm font-medium text-[#f29221]">CVV</label>
@@ -178,6 +192,7 @@ const PaymentOptions = () => {
           className="block w-full mt-1 px-3 py-2 bg-white text-black border border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          required
         />
         {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
       </div>

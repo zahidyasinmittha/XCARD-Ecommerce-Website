@@ -6,8 +6,12 @@ import { toast } from "react-toastify";
 // Fetch user details
 export const fetchUser = createAsyncThunk("user/fetchUser", async () => {
   try {
+    const loading = toast.loading("Fetching data, Please wait...", {
+      position: "bottom-center",
+    });
     const axiosInstance = axios.create({ withCredentials: true });
     const response = await axiosInstance(apiUrls.userDetails.url);
+    toast.dismiss(loading.current);
     if (response.data.error) {
       toast.error(response.data.message, { position: "bottom-center" });
       throw new Error(response.data.message);
@@ -74,6 +78,31 @@ export const updateUserBasicDetails = createAsyncThunk(
   }
 );
 
+export const UpdateInfo = createAsyncThunk(
+  "user/paymentOptionUpdate",
+  async ({userDetail, url }) => {
+    console.log(url,userDetail)
+    try {
+      const axiosInstance = axios.create({ withCredentials: true });
+      const response = await axiosInstance.put(
+        url,
+        userDetail
+      );
+      console.log(response)
+      if (response.data.error) {
+        toast.error(response.data.message, { position: "bottom-center" });
+      }
+      else{
+      toast.success(response.data.message, { position: "bottom-center" });
+      return response.data;
+      }
+    } catch (error) {
+      toast.error("Something went wrong", { position: "bottom-center" });
+    }
+  }
+);
+
+
 // Initial state
 const initialState = {
   userDetail: null,
@@ -97,7 +126,6 @@ const userDetailSlice = createSlice({
         state.userDetail = null;
       })
       .addCase(updateUserBasicDetails.fulfilled, (state, action) => {
-        console.log(action.payload)
         if (action.payload?.codeSend === undefined)
           state.userDetail = action.payload;
         else {
@@ -106,7 +134,10 @@ const userDetailSlice = createSlice({
             msg: action.payload
           };
         }
-      });
+      })
+      .addCase(UpdateInfo.fulfilled, (state, action) => {
+          state.userDetail = action.payload;
+      })
   },
 });
 

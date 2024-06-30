@@ -1,31 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import apiUrls from "../../common/apiUrls";
+import { useDispatch, useSelector } from "react-redux";
+import { UpdateInfo} from "../../redux/slice/userSlice";
+import axios from "axios";
+
 
 const Settings = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userDetail = useSelector((state) => state.userDetail.userDetail);
   const [isSeller, setIsSeller] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+
+  useEffect(() => {
+    const isLogedIn = Cookies.get("isLogedIn");
+
+    if (!isLogedIn || isLogedIn === "false") {
+      navigate("/login");
+      return;
+    }
+    if (userDetail?.data) {
+      console.log(userDetail.data.role)
+      if(userDetail.data.role === 'user')
+        setIsSeller(false);
+      if(userDetail.data.role === 'seller')
+        setIsSeller(true);
+    }
+  }, [userDetail]);
 
   const handleBecomeSeller = () => {
-    setIsSeller(!isSeller);
+    if(isSeller){
+      toast.error("You is already a Seller",{ position: "bottom-center" });
+      return
+    }
+    dispatch(UpdateInfo({ url: apiUrls.becomeSeller.url, userDetail: {} }));
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount =async () => {
+    let con = confirm("Are you sure you want to delete your account")
     // Add logic for deleting the account
-    alert("Account deleted.");
+    if(con){
+      const loading = toast.loading("deleting Account, Please wait...", {
+        position: "bottom-center",
+      });
+      const axiosInstance = axios.create({ withCredentials: true });
+      const response = await axiosInstance.delete(apiUrls.deleteUser.url);
+      toast.dismiss(loading.current);
+      if (response.data.error) {
+        toast.error(response.data.message, { position: "bottom-center" });
+        throw new Error(response.data.message);
+      }
+      if(response.data.success){
+      toast.success(response.data.message, { position: "bottom-center" });
+      window.location.href = '/login';
+      }
+    }
   };
 
   const handleChangePassword = (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      setPasswordError("New passwords do not match.");
+      toast.error("New passwords do not match.",{ position: "bottom-center" });
       return;
     }
-    setPasswordError("");
-    // Implement change password functionality, e.g., API call
+    
     console.log("Password changed:", { currentPassword, newPassword });
+    dispatch(UpdateInfo({ url: apiUrls.updatePassword.url, userDetail: { currentPassword: currentPassword, newPassword: newPassword } }));
+    // Reset password fields after successful change
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
   };
 
   return (
@@ -81,7 +131,6 @@ const Settings = () => {
             placeholder="Confirm new password"
             className="block w-full mt-1 px-3 py-2 bg-white text-black border border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
           />
-          {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
         </motion.div>
 
         <motion.div
