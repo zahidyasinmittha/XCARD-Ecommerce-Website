@@ -151,7 +151,7 @@ function BasicInformation() {
         name="email"
         value={verificationCode}
         onChange={(e) => setverificationCode(e.target.value)}
-        placeholder="Enter your email"
+        placeholder="Enter Verification Code"
         className="mr-3 mt-1 p-1 text-black border-2 border-gray-700 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition duration-300"
         required
       />

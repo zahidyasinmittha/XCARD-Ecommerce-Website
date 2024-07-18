@@ -51,6 +51,22 @@ const apiUrls = {
     deleteUser: {
         url: `${domain}/api/deleteUser`,
         method: 'DELETE'
-    }
+    },
+    createOrUpdateStore: {
+        url: `${domain}/api/createOrUpdateStore`,
+        method: 'POST'
+    },
+    fatchStoreDetails: {
+        url: `${domain}/api/fatchStoreDetails`,
+        method: 'GET'
+    },
+    createProduct: {
+        url: `${domain}/api/createProduct`,
+        method: 'POST'
+    },
+    getAllProductsOfStore: {
+        url: `${domain}/api/getAllProductsOfStore`,
+        method: 'GET'
+    },
 }
 export default apiUrls;

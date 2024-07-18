@@ -27,12 +27,16 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async () => {
 // Logout user
 export const logoutUser = createAsyncThunk("user/logoutUser", async () => {
   try {
+    const loading = toast.loading("Loading, Please wait...", {
+      position: "bottom-center",
+    });
     const axiosInstance = axios.create({ withCredentials: true });
     const response = await axiosInstance(apiUrls.logout.url);
     if (response.data.error) {
       toast.error(response.data.message, { position: "bottom-center" });
       throw new Error(response.data.message);
     }
+    toast.dismiss(loading.current);
     toast.success(response.data.message, { position: "bottom-center" });
     return response.data;
   } catch (error) {
@@ -81,7 +85,6 @@ export const updateUserBasicDetails = createAsyncThunk(
 export const UpdateInfo = createAsyncThunk(
   "user/paymentOptionUpdate",
   async ({userDetail, url }) => {
-    console.log(url,userDetail)
     try {
       const axiosInstance = axios.create({ withCredentials: true });
       const response = await axiosInstance.put(

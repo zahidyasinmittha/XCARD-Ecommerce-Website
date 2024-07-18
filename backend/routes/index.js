@@ -12,6 +12,10 @@ const shippingAddressUpdateController = require('../controller/shippingAddressUp
 const updatePasswordController = require("../controller/updatePassword")
 const becomeSellerController = require('../controller/becomeASeller')
 const deleteUserController = require('../controller/deleteAccount')
+const createOrUpdateStoreController = require('../controller/CreateUpdateStore')
+const fatchStoreDetailsController = require('../controller/fatchStoreDetails')
+const createProductController = require("../controller/CreatenewProduct")
+const getAllProductsOfStoreController = require("../controller/GetAllTheStoreProduct")
 const router = express.Router()
 
 router.post('/signup', userSignUpController)
@@ -27,5 +31,9 @@ router.put('/shippingAddressUpdate', shippingAddressUpdateController)
 router.put('/updatePassword', updatePasswordController)
 router.put('/becomeSeller', becomeSellerController)
 router.delete('/deleteUser', deleteUserController)
+router.post('/createOrUpdateStore', createOrUpdateStoreController)
+router.get('/fatchStoreDetails', fatchStoreDetailsController)
+router.post('/createProduct', createProductController)
+router.get('/getAllProductsOfStore', getAllProductsOfStoreController)
 
 module.exports = router

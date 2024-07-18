@@ -1,8 +1,15 @@
 import React from 'react'
+import { DealSection , GridComponent, ProductSection, FeedbackSection } from '../components'
 
 function Home() {
-  return (
-    <div>Home</div>
+  return (  
+    <div className='bg-slate-200'>
+        <GridComponent />
+        <ProductSection />
+        <DealSection />
+        <ProductSection />
+        <FeedbackSection />
+    </div>
   )
 }
 
